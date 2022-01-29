@@ -1,51 +1,73 @@
 <script>
-  let todos = [];
+	let todos = [];
 
-  let task = "";
+	let task = '';
 
-  const addTodo = () => {
-    let todo = {
-      task: task,
-      isComplete: false,
-      createdAt: new Date()
-    };
-    todos = [todo, ...todos];
-    task=""
-  };
+	let error = '';
 
-  const markTodoAsComplete = (index) => {
-    todos[index].isComplete = !todos[index].isComplete
-  }
+	const addTodo = () => {
+		let todo = {
+			task: task,
+			isComplete: false,
+			createdAt: new Date()
+		};
 
-  const deleteTodo = (index) => {
-    let deleteItem = todos[index]
-    todos = todos.filter((item) => item !=deleteItem)
-  };
+		if (task !== '') {
+			todos = [todo, ...todos];
+			error = '';
+		} else {
+			error = 'Task is empty';
+		}
 
-  $: console.table(todos)
+		task = '';
+	};
+
+	const markTodoAsComplete = (index) => {
+		todos[index].isComplete = !todos[index].isComplete;
+	};
+
+	const deleteTodo = (index) => {
+		let deleteItem = todos[index];
+		todos = todos.filter((item) => item != deleteItem);
+	};
+
+	const keyIsPressed = (evt) => {
+		if (evt.key === 'Enter') {
+			addTodo();
+		}
+	};
+
+	$: console.table(todos);
 </script>
 
-<input type="text" placeholder="Add a task" bind:value={task}>
+<input type="text" placeholder="Add a task" bind:value={task} />
 <button on:click={addTodo}>Add</button>
 
 <ol>
- {#each todos as item, index}
-    <li class:complete={item.isComplete}>
-      <span>
-        {item.task}
-      </span>
-      <span>
-        <button on:click={() => markTodoAsComplete(index)}>✔</button>
-        <button on:click={() => deleteTodo(index)}>✘</button>
-      </span>
-    </li>
-    {:else}
-    <p>No todos found</p>
- {/each}
+	{#each todos as item, index}
+		<li class:complete={item.isComplete}>
+			<span>
+				{item.task}
+			</span>
+			<span>
+				<button on:click={() => markTodoAsComplete(index)}>✔</button>
+				<button on:click={() => deleteTodo(index)}>✘</button>
+			</span>
+		</li>
+	{:else}
+		<p>No todos found</p>
+	{/each}
+	<p class="error">{error}</p>
 </ol>
 
+<svelte:window on:keydown={keyIsPressed} />
+
 <style>
-  .complete {
-    text-decoration: line-through;
-  }
+	.complete {
+		text-decoration: line-through;
+	}
+
+	.error {
+		color: red;
+	}
 </style>
